@@ -9,6 +9,8 @@ import edu.umd.cs.psl.er.weightlearning.WeightLearning
 import edu.umd.cs.psl.model.predicate.Predicate
 import edu.umd.cs.psl.ui.functions.textsimilarity.*
 
+import java.io.FileReader;
+
 
 /*
  * First, we'll parse the command line arguments.
@@ -212,22 +214,39 @@ if (learnWeights)
 /*** INFERENCE ***/
 
 /*
+ * Note: to run evaluation of ER inference, we need to specify the total number of
+ * pairwise combinations of authors and papers, which we pass to evaluateModel() in an array.
+ * This is for memory efficiency, since we don't want to actually load truth data for all
+ * possible pairs (though one could).
+ *
+ * To get the total number of possible combinations, we'll scan the author/paper reference files,
+ * counting the number of lines.
+ */
+int[] authorCnt = new int[2];
+int[] paperCnt = new int[2];
+FileReader rdr = null;
+for (int i = 0; i < 2; i++) {
+	rdr = new FileReader(datadir + "authorName." + i + ".txt");
+	while (rdr.readLine() != null) authorCnt[i]++;
+	println "Authors fold " + i + ": " + authorCnt[i];
+	rdr = new FileReader(datadir + "paperTitle." + i + ".txt");
+	while (rdr.readLine() != null) paperCnt[i]++;
+	println "Papers  fold " + i + ": " + paperCnt[i];
+}
+
+/*
  * You can uncomment this section if you'd like to evaluate inference on the training set.
  */
 println "Starting inference on the training fold ... ";
 ModelEvaluation eval0 = new ModelEvaluation(m,data);
 eval0.setConfigBundle(cb);
-eval0.evaluateModel([sameAuthor, samePaper], evidenceTrainingPartition, targetTrainingPartition, [1574*1573,1116*1115]);
+eval0.evaluateModel([sameAuthor, samePaper], evidenceTrainingPartition, targetTrainingPartition
+					 , [authorCnt[0]*(authorCnt[0]-1), paperCnt[0]*(paperCnt[0]-1)]);
 
-/*
- * Note: to run evaluation of ER inference, we need to specify the total number of
- * pairwise combinations of authors and papers, which we pass to evaluateModel() in an array.
- * This is for memory efficiency, since we don't want to actually load truth data for all
- * possible pairs (though one could).
- */
 println "Starting inference on the testing fold ... ";
 ModelEvaluation eval1 = new ModelEvaluation(m,data);
 eval1.setConfigBundle(cb);
-eval1.evaluateModel([sameAuthor, samePaper], evidenceTestingPartition, targetTestingPartition, [1316*1315,809*808]);
+eval1.evaluateModel([sameAuthor, samePaper], evidenceTestingPartition, targetTestingPartition
+				  , [authorCnt[1]*(authorCnt[1]-1), paperCnt[1]*(paperCnt[1]-1)]);
 
 
