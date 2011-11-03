@@ -16,7 +16,7 @@ import java.io.FileReader;
  * First, we'll parse the command line arguments.
  */
 if (args.size() < 1) {
-	println "\nusage: AuthorPaperER <data_dir> [ -l ]\n";
+	println "\nUsage: AuthorPaperER <data_dir> [ -l ]\n";
 	return 1;
 }
 def datadir = args[0];
@@ -67,7 +67,7 @@ m.add predicate: "sameNumTokens", title1: Text,    title2  : Text;
 /*
  * Set comparison functions operate on sets and return a scalar.
  */
-m.add setcomparison: "sameAuthorSet" , using: SetComparison.Equality, on : sameAuthor;
+m.add setcomparison: "sameAuthorSet" , using: SetComparison.CrossEquality, on : sameAuthor;
 
 /*
  * Now we can put everything together by defining some rules for our model.
