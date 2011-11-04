@@ -49,12 +49,12 @@ class WeightLearning {
 	public void initLearningConfig() {
 		learningConfig = new WeightLearningConfiguration();
 		learningConfig.setLearningType(WeightLearningConfiguration.Type.LBFGSB);
-		learningConfig.setPointMoveConvergenceThres(1e-4);
+		learningConfig.setPointMoveConvergenceThres(1E-5);
 		learningConfig.setMaxOptIterations(100);
 		learningConfig.setParameterPrior(1); // 1/variance
 		learningConfig.setRuleMean(1);
 		learningConfig.setUnitRuleMean(1);
-		learningConfig.setActivationThreshold(0.1);
+		learningConfig.setActivationThreshold(1E-10);
 		learningConfig.setInitialParameter(1.0);
 	}
 	
