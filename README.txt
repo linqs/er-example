@@ -32,9 +32,17 @@ For instructions for other platforms, go to:
 
 4) Run the ER example: First decompress the included tar-ball to a working directory on your machine. This contains the source code, data files and a Maven project. There are several steps necessary to run the program:
 
-Compile the program using the command:  	>> mvn compile 
-Generate the classpath using the command:  	>> mvn dependency:build-classpath -Dmdep.outputFile=classpath.out  (Note: you only have to do this once, and after that only if the dependencies change. i.e. If you just make a small tweak to the source code, you don't need to re-generate the classpath.) 
-Run the program with the following command (from within the project's directory):  	>> java -Xmx8192m -cp ./target/classes:`cat classpath.out` edu.umd.cs.psl.er.AuthorPaperER  (Warning: this will set the heap size to 8GB. Make sure your system can handle this.)
+Compile the program using the command:
+
+	>> mvn compile 
+Generate the classpath using the command:
+
+	>> mvn dependency:build-classpath -Dmdep.outputFile=classpath.out  (Note: you only have to do this once, and after that only if the dependencies change. i.e. If you just make a small tweak to the source code, you don't need to re-generate the classpath.) 
+Run the program with the following command (from within the project's directory):
+
+	>> java -Xmx2048m -cp ./target/classes:`cat classpath.out` edu.umd.cs.psl.er.AuthorPaperER <data_dir> [ -l ]
+
+where <data_dir> is the relative path to the data (e.g. data/CiteSeer/big) and the optional parameter "-l" invokes weight learning (as opposed to manual weights). Note: the "-Xmx2048m" option increases the maximum heap size to 2GB. Make sure your system can handle this. If you opt to load all of the data into main memory, you may want to up this number to 4-8GB.
 
 5) (Optional) Create an Eclipse project: To convert a Maven project to an Eclipse project, simply type the following command (within the project's directory):
 

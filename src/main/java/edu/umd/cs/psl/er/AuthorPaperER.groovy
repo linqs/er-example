@@ -110,10 +110,17 @@ println "done!"
 println "Creating a new DB and loading data:"
 
 /*
- * This creates a new relational DB.
- * The setup command instructs it to use the H2 driver, with memory as a backing store.
+ * We'll create a new relational DB.
  */
 DataStore data = new RelationalDataStore(m);
+/*
+ * The setup command instructs the DB to use the H2 driver.
+ * It can also tell it to use memory as its backing store, or alternately a
+ * specific directory in the file system. If neither is specified, the default
+ * location is a file in the project root directory.
+ * NOTE: In our experiments, we have found that using the hard drive performed
+ * better than using main memory, though this may vary from system to system.
+ */
 //data.setup db: DatabaseDriver.H2, type: "memory";
 data.setup db: DatabaseDriver.H2, folder: "/scratch/";
 
