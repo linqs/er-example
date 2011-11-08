@@ -1,16 +1,24 @@
 package edu.umd.cs.psl.er
 
+import java.io.FileReader;
+import java.util.concurrent.TimeUnit;
+
 import edu.umd.cs.psl.config.*
 import edu.umd.cs.psl.database.RDBMS.DatabaseDriver
 import edu.umd.cs.psl.groovy.*
 import edu.umd.cs.psl.groovy.experiments.ontology.*
-import edu.umd.cs.psl.er.modelevaluation.ModelEvaluation
-import edu.umd.cs.psl.er.weightlearning.WeightLearning
 import edu.umd.cs.psl.model.predicate.Predicate
 import edu.umd.cs.psl.ui.functions.textsimilarity.*
+import edu.umd.cs.psl.evaluation.resultui.UIFullInferenceResult
 
-import java.io.FileReader;
+import edu.umd.cs.psl.er.evaluation.ModelEvaluation
 
+
+/*
+ * Start and end times for timing information.
+ */
+def startTime;
+def endTime;
 
 /*
  * First, we'll parse the command line arguments.
@@ -29,12 +37,6 @@ if (args.size() >= 2) {
 println "\n*** PSL ER EXAMPLE ***\n"
 println "Data directory  : " + datadir;
 println "Weight learning : " + (learnWeights ? "ON" : "OFF");
-
-
-/* 
- * Let's start a timer.
- */
-long startTime = System.nanoTime();
 
 
 /*
@@ -77,9 +79,9 @@ m.add setcomparison: "sameAuthorSet" , using: SetComparison.CrossEquality, on : 
  * Here are some basic rules.
  */
 // similar names => same author
-m.add rule : (authorName(A1,N1) & authorName(A2,N2) & simName(N1,N2)) >> sameAuthor(A1,A2), weight : 0.9009869263961426;
+m.add rule : (authorName(A1,N1) & authorName(A2,N2) & simName(N1,N2)) >> sameAuthor(A1,A2), weight : 1.0;
 // similar titles => same paper
-m.add rule : (paperTitle(P1,T1) & paperTitle(P2,T2) & simTitle(T1,T2) ) >> samePaper(P1,P2),  weight : 0.9246392859883283;
+m.add rule : (paperTitle(P1,T1) & paperTitle(P2,T2) & simTitle(T1,T2) ) >> samePaper(P1,P2),  weight : 1.0;
 
 /*
  * Here are some relational rules.
@@ -87,10 +89,10 @@ m.add rule : (paperTitle(P1,T1) & paperTitle(P2,T2) & simTitle(T1,T2) ) >> sameP
  */
 // if two references share a common publication, and have the same initials, then => same author
 m.add rule : (authorOf(A1,P1)   & authorOf(A2,P2)   & samePaper(P1,P2) &
-              authorName(A1,N1) & authorName(A2,N2) & sameInitials(N1,N2)) >> sameAuthor(A1,A2), weight : 1.2102269147345088;
+              authorName(A1,N1) & authorName(A2,N2) & sameInitials(N1,N2)) >> sameAuthor(A1,A2), weight : 1.0;
 // if two papers have a common set of authors, and the same number of tokens in the title, then => same paper
 m.add rule : (sameAuthorSet({P1.authorOf(inv)},{P2.authorOf(inv)}) & paperTitle(P1,T1) & paperTitle(P2,T2) & 
-              sameNumTokens(T1,T2)) >> samePaper(P1,P2),  weight : 1.0330894968159279;
+              sameNumTokens(T1,T2)) >> samePaper(P1,P2),  weight : 1.0;
 
 /* 
  * Now we'll add a prior to the open predicates.
@@ -121,6 +123,7 @@ DataStore data = new RelationalDataStore(m);
  * NOTE: In our experiments, we have found that using the hard drive performed
  * better than using main memory, though this may vary from system to system.
  */
+//data.setup db: DatabaseDriver.H2;
 //data.setup db: DatabaseDriver.H2, type: "memory";
 data.setup db: DatabaseDriver.H2, folder: "/scratch/";
 
@@ -148,13 +151,13 @@ def insert;
 for (Predicate p1 : [authorName, paperTitle, authorOf, sameInitials, sameNumTokens])
 {
 	String trainFile = datadir + p1.getName() + "." + trainingFold + ".txt";
-	print "\tReading " + trainFile + " ... ";
+	print "  Reading " + trainFile + " ... ";
 	insert = data.getInserter(p1,evidenceTrainingPartition);
 	insert.loadFromFile(trainFile);
 	println "done!"
 
 	String testFile = datadir + p1.getName() + "." + testingFold + ".txt";
-	print "\tReading " + testFile + " ... ";
+	print "  Reading " + testFile + " ... ";
 	insert = data.getInserter(p1,evidenceTestingPartition);
 	insert.loadFromFile(testFile);
 	println "done!"
@@ -165,13 +168,13 @@ for (Predicate p1 : [authorName, paperTitle, authorOf, sameInitials, sameNumToke
 for (Predicate p2 : [simName, simTitle])
 {
 	String trainFile = datadir + p2.getName() + "." + trainingFold + ".txt";
-	print "\tReading " + trainFile + " ... ";
+	print "  Reading " + trainFile + " ... ";
 	insert = data.getInserter(p2,evidenceTrainingPartition);
 	insert.loadFromFileWithTruth(trainFile);
 	println "done!"
 
 	String testFile = datadir + p2.getName() + "." + testingFold + ".txt";
-	print "\tReading " + testFile + " ... ";
+	print "  Reading " + testFile + " ... ";
 	insert = data.getInserter(p2,evidenceTestingPartition);
 	insert.loadFromFileWithTruth(testFile);
 	println "done!"
@@ -183,14 +186,14 @@ for (Predicate p3 : [sameAuthor,samePaper])
 {
 	//training data
 	String trainFile = datadir + p3.getName() + "." + trainingFold + ".txt";
-	print "\tReading " + trainFile + " ... ";
+	print "  Reading " + trainFile + " ... ";
 	insert = data.getInserter(p3,targetTrainingPartition)
 	insert.loadFromFileWithTruth(trainFile);
 	println "done!"
 	
 	//testing data
 	String testFile = datadir + p3.getName() + "." + testingFold + ".txt";
-	print "\tReading " + testFile + " ... ";
+	print "  Reading " + testFile + " ... ";
 	insert = data.getInserter(p3,targetTestingPartition)
 	insert.loadFromFileWithTruth(testFile);
 	println "done!"
@@ -204,12 +207,27 @@ for (Predicate p3 : [sameAuthor,samePaper])
  */
 if (learnWeights)
 {
-	print "Starting weight learning ... ";
-	WeightLearning w = new WeightLearning(m,data);
-	w.setConfigBundle(cb);
-	m = w.learnModel([sameAuthor, samePaper], evidenceTrainingPartition, targetTrainingPartition);
+	/*
+	 * We need to setup some weight learning parameters.
+	 */
+	def learningConfig = new WeightLearningConfiguration();
+	learningConfig.setLearningType(WeightLearningConfiguration.Type.LBFGSB);	// limited-memory BFGS optimization
+	learningConfig.setPointMoveConvergenceThres(1E-5);							// convergence threshold
+	learningConfig.setMaxOptIterations(100);									// maximum iterations
+	learningConfig.setParameterPrior(1);										// 1/variance
+	learningConfig.setRuleMean(0.1);											// init weight value for rules
+	learningConfig.setUnitRuleMean(1.0);										// init weight value for priors
+	learningConfig.setActivationThreshold(1E-10);								// rule activation threshold
+
+	/*
+	 * Now we run the learning algorithm.
+	 */
+	print "\nStarting weight learning ... ";
+	startTime = System.nanoTime();
+	m.learn data, evidence:evidenceTrainingPartition, infered:targetTrainingPartition, close:[sameAuthor,samePaper], configuration:learningConfig, config:cb;
+	endTime = System.nanoTime();
 	println "done!"
-	println "\tWeight learning took " + w.printRunningTime() + " secs";
+	println "  Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime) + " secs";
 	
 	/*
 	 * Now let's print the model to see the learned weights.
@@ -242,18 +260,30 @@ for (int i = 0; i < 2; i++) {
 }
 
 /*
- * You can uncomment this section if you'd like to evaluate inference on the training set.
+ * Let's create an instance of our evaluation class.
  */
-println "Starting inference on the training fold ... ";
-ModelEvaluation eval0 = new ModelEvaluation(m,data);
-eval0.setConfigBundle(cb);
-eval0.evaluateModel([sameAuthor, samePaper], evidenceTrainingPartition, targetTrainingPartition
-					 , [authorCnt[0]*(authorCnt[0]-1), paperCnt[0]*(paperCnt[0]-1)]);
+def eval = new ModelEvaluation(data);
 
-println "Starting inference on the testing fold ... ";
-ModelEvaluation eval1 = new ModelEvaluation(m,data);
-eval1.setConfigBundle(cb);
-eval1.evaluateModel([sameAuthor, samePaper], evidenceTestingPartition, targetTestingPartition
-				  , [authorCnt[1]*(authorCnt[1]-1), paperCnt[1]*(paperCnt[1]-1)]);
+/*
+ * Evalute inference on the training set.
+ */
+print "\nStarting inference on the training fold ... ";
+startTime = System.nanoTime();
+def trainingInference = m.mapInference(data.getDatabase(read: evidenceTrainingPartition), cb);
+endTime = System.nanoTime();
+println "done!";
+println "  Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime) + " secs";
+eval.evaluateModel(trainingInference, [sameAuthor, samePaper], targetTrainingPartition, [authorCnt[0]*(authorCnt[0]-1), paperCnt[0]*(paperCnt[0]-1)]);
+
+/*
+* Now evaluate inference on the testing set (to check model generalization).
+*/
+print "\nStarting inference on the testing fold ... ";
+startTime = System.nanoTime();
+def testingInference = m.mapInference(data.getDatabase(read: evidenceTestingPartition), cb);
+endTime = System.nanoTime();
+println "done!";
+println "  Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime) + " secs";
+eval.evaluateModel(testingInference, [sameAuthor, samePaper], targetTestingPartition, [authorCnt[1]*(authorCnt[1]-1), paperCnt[1]*(paperCnt[1]-1)]);
 
 
