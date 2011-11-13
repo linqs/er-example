@@ -14,28 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.umd.cs.psl.er.external;
+package edu.umd.cs.psl.er.similarity;
 
 import java.util.*;
 import edu.umd.cs.psl.model.function.AttributeSimilarityFunction;
-//import edu.umd.cs.psl.model.argument.Attribute;
-//import edu.umd.cs.psl.model.argument.GroundTerm;
-//import edu.umd.cs.psl.model.argument.type.ArgumentType;
-//import edu.umd.cs.psl.model.argument.type.ArgumentTypes;
-//import edu.umd.cs.psl.model.function.ExternalFunction;
-//import edu.umd.cs.psl.model.predicate.type.PredicateType;
-//import edu.umd.cs.psl.model.predicate.type.PredicateTypes;
 
 /**
- * This is an example external function.
+ * This external similarity function returns 1 if the
+ * input strings contain the same number of tokens,
+ * and 0 otherwise.
  */
-class SameInitials implements AttributeSimilarityFunction {
+class SameNumTokens implements AttributeSimilarityFunction
+{
     public double similarity (String a, String b) {
-	String[] tokens0 = a.split("\\s+");
-	String[] tokens1 = b.split("\\s+");
-	if (tokens0.length != tokens1.length) return 0.0;
-	for(int i = 0; i < tokens0.length; i++)
-	    if (tokens0[i].charAt(0) != tokens1[i].charAt(0)) return 0.0;
-	return 1.0;
+		String[] tokens0 = a.split("\\s+");
+		String[] tokens1 = b.split("\\s+");
+		if (tokens0.length != tokens1.length)
+			return 0.0;
+		return 1.0;
     }
 }

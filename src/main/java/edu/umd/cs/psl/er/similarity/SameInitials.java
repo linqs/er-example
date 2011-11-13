@@ -14,18 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.umd.cs.psl.er.external;
+package edu.umd.cs.psl.er.similarity;
 
 import java.util.*;
 import edu.umd.cs.psl.model.function.AttributeSimilarityFunction;
+
 /**
- * This is an example external function.
+ * This external similarity function returns 1 if the input names
+ * have the same initials, and 0 otherwise.
  */
-class SameNumTokens implements AttributeSimilarityFunction {
+class SameInitials implements AttributeSimilarityFunction
+{
     public double similarity (String a, String b) {
-	String[] tokens0 = a.split("\\s+");
-	String[] tokens1 = b.split("\\s+");
-	if (tokens0.length != tokens1.length) return 0.0;
-	return 1.0;
+		String[] tokens0 = a.split("\\s+");
+		String[] tokens1 = b.split("\\s+");
+		if (tokens0.length != tokens1.length)
+			return 0.0;
+		for(int i = 0; i < tokens0.length; i++)
+			if (tokens0[i].charAt(0) != tokens1[i].charAt(0))
+				return 0.0;
+		return 1.0;
     }
 }

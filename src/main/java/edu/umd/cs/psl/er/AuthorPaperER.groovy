@@ -12,7 +12,9 @@ import edu.umd.cs.psl.ui.functions.textsimilarity.*
 import edu.umd.cs.psl.evaluation.resultui.UIFullInferenceResult
 
 import edu.umd.cs.psl.er.evaluation.ModelEvaluation
-import edu.umd.cs.psl.er.external.*
+import edu.umd.cs.psl.er.similarity.TitleSimilarity
+import edu.umd.cs.psl.er.similarity.SameInitials
+import edu.umd.cs.psl.er.similarity.SameNumTokens
 
 /*
  * Start and end times for timing information.
@@ -54,19 +56,17 @@ PSLModel m = new PSLModel(this);
 
 /*
  * These are the predicates for our model.
+ * Predicates are precomputed.
+ * Functions are computed online.
  * "Open" predicates are ones that must be inferred.
  */
 m.add predicate: "authorName" , author  : Entity,  name    : Text;
 m.add predicate: "paperTitle" , paper   : Entity,  title   : Text;
 m.add predicate: "authorOf"   , author  : Entity,  paper   : Entity;
-//m.add predicate: "simName"    , name1   : Text,    name2   : Text;
-//m.add predicate: "simTitle"   , title1  : Text,    title2  : Text;
-//m.add predicate: "sameInitials", name1: Text,    name2   : Text
-//m.add predicate: "sameNumTokens", title1: Text,    title2  : Text;
-m.add function: "simName",  name1 : Text, name2 : Text, implementation: new LevenshteinStringSimilarity();
-m.add function: "simTitle", title1 : Text, title2 : Text, implementation: new TitleSimilarity();
-m.add function: "sameInitials" , name1 : Text,    name2   : Text, implementation: new SameInitials();
-m.add function: "sameNumTokens" , name1 : Text,    name2   : Text, implementation: new SameNumTokens();
+m.add function:  "simName"    , name1   : Text,    name2   : Text	, implementation: new LevenshteinStringSimilarity();
+m.add function:  "simTitle"   , title1  : Text,    title2  : Text	, implementation: new TitleSimilarity();
+m.add function:  "sameInitials", name1  : Text,    name2   : Text	, implementation: new SameInitials();
+m.add function:  "sameNumTokens", title1: Text,    title2  : Text	, implementation: new SameNumTokens();
 m.add predicate: "sameAuthor" , author1 : Entity,  author2 : Entity, open: true;
 m.add predicate: "samePaper"  , paper1  : Entity,  paper2  : Entity, open: true;
 /*
@@ -151,8 +151,7 @@ def insert;
 /* 
  * We start by reading in the non-target (i.e. evidence) predicate data.
  */
-//for (Predicate p1 : [authorName, paperTitle, authorOf, sameInitials, sameNumTokens])
-for (Predicate p1 : [authorName, paperTitle, authorOf])
+for (Predicate p1 : [authorName,paperTitle,authorOf])
 {
 	String trainFile = datadir + p1.getName() + "." + trainingFold + ".txt";
 	print "  Reading " + trainFile + " ... ";
@@ -166,23 +165,6 @@ for (Predicate p1 : [authorName, paperTitle, authorOf])
 	insert.loadFromFile(testFile);
 	println "done!"
 }
-/*
- * This is the precomputed similarity predicate data.
- */
-//for (Predicate p2 : [simName, simTitle])
-//{
-//	String trainFile = datadir + p2.getName() + "." + trainingFold + ".txt";
-//	print "  Reading " + trainFile + " ... ";
-//	insert = data.getInserter(p2,evidenceTrainingPartition);
-//	insert.loadFromFileWithTruth(trainFile);
-//	println "done!"
-
-//	String testFile = datadir + p2.getName() + "." + testingFold + ".txt";
-//	print "  Reading " + testFile + " ... ";
-//	insert = data.getInserter(p2,evidenceTestingPartition);
-//	insert.loadFromFileWithTruth(testFile);
-//	println "done!"
-//}
 /* 
  * Now we read the target predicate data.
  */

@@ -14,18 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.umd.cs.psl.er.external;
+package edu.umd.cs.psl.er.similarity;
 
 import java.util.*;
 import edu.umd.cs.psl.model.function.AttributeSimilarityFunction;
+
 /**
- * This is an example external function.
+ * This external function computes the similarity between two
+ * paper titles using the dice similarity.
+ * If the similarity is below 0.5, it returns 0; otherwise,
+ * it returns the dice similarity value.
  */
-class SameNumTokens implements AttributeSimilarityFunction {
+class TitleSimilarity implements AttributeSimilarityFunction {
+	// similarity threshold (default=0.5)
+	private double simThresh;
+	
+	// constructors
+	public TitleSimilarity() {
+		this.simThresh = 0.5;
+	}
+	public TitleSimilarity(double simThresh) {
+		this.simThresh = simThresh;
+	}
+	
+	// similarity function
     public double similarity (String a, String b) {
-	String[] tokens0 = a.split("\\s+");
-	String[] tokens1 = b.split("\\s+");
-	if (tokens0.length != tokens1.length) return 0.0;
-	return 1.0;
+		double sim = DiceSimilarity.similarity(a,b);
+		if (sim < simThresh) 
+			return 0.0;
+		else 
+			return sim;
     }
 }
