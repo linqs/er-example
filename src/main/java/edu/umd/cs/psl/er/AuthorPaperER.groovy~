@@ -63,7 +63,7 @@ m.add predicate: "authorOf"   , author  : Entity,  paper   : Entity;
 //m.add predicate: "simTitle"   , title1  : Text,    title2  : Text;
 //m.add predicate: "sameInitials", name1: Text,    name2   : Text
 //m.add predicate: "sameNumTokens", title1: Text,    title2  : Text;
-m.add function: "simName",  name1 : Text, name2 : Text, implementation: new LevenshteinStringSimilarity();
+m.add function: "simName",  name1 : Text, name2 : Text, implementation: new NameSimilarity();
 m.add function: "simTitle", title1 : Text, title2 : Text, implementation: new TitleSimilarity();
 m.add function: "sameInitials" , name1 : Text,    name2   : Text, implementation: new SameInitials();
 m.add function: "sameNumTokens" , name1 : Text,    name2   : Text, implementation: new SameNumTokens();
