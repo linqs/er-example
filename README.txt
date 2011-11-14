@@ -28,23 +28,35 @@ Be sure to set the appropriate environment variables for Mosek. For 64-bit Linux
 For instructions for other platforms, go to:
 
 	http://docs.mosek.com/6.0/toolsinstall/node003.html
+	
+
+4) Download the ER example: The example is hosted on Github. To download the files, simply execute the following command:
+
+	>> git clone git@github.com:linqs/er-example.git
+
+Once you've downloaded everything, uncompress the data files (data.tar.gz) to the project directory.
 
 
-4) Run the ER example: First decompress the included tar-ball to a working directory on your machine. This contains the source code, data files and a Maven project. There are several steps necessary to run the program:
+5) Run the ER example: There are several steps necessary to run the program:
 
-Compile the program using the command:
+5a) Compile the program using the command:
 
 	>> mvn compile 
-Generate the classpath using the command:
+	
+5b) Generate the classpath using the command:
 
-	>> mvn dependency:build-classpath -Dmdep.outputFile=classpath.out  (Note: you only have to do this once, and after that only if the dependencies change. i.e. If you just make a small tweak to the source code, you don't need to re-generate the classpath.) 
-Run the program with the following command (from within the project's directory):
+	>> mvn dependency:build-classpath -Dmdep.outputFile=classpath.out  Note: you only have to do this once, and after that only if the dependencies change. i.e. If you just make a small tweak to the source code, you don't need to re-generate the classpath.
+
+5c) Run the program with the following command (from within the project's directory):
 
 	>> java -Xmx2048m -cp ./target/classes:`cat classpath.out` edu.umd.cs.psl.er.AuthorPaperER <data_dir> [ -l ]
 
-where <data_dir> is the relative path to the data (e.g. data/CiteSeer/big) and the optional parameter "-l" invokes weight learning (as opposed to manual weights). Note: the "-Xmx2048m" option increases the maximum heap size to 2GB. Make sure your system can handle this. If you opt to load all of the data into main memory, you may want to up this number to 4-8GB.
+where <data_dir> is the relative path to the data (e.g. data/CiteSeer/big) and the optional parameter "-l" invokes weight learning (as opposed to manual weights, which are by default all 1).
 
-5) (Optional) Create an Eclipse project: To convert a Maven project to an Eclipse project, simply type the following command (within the project's directory):
+Note: the "-Xmx2048m" option increases the maximum heap size to 2GB. Make sure your system can handle this. If you opt to load all of the data into main memory, you may want to up this number to 4-8GB.
+
+
+6) (Optional) Create an Eclipse project: To convert a Maven project to an Eclipse project, simply type the following command (within the project's directory):
 
 	>> mvn eclipse:eclipse
 
@@ -52,6 +64,7 @@ Then simply import the project into your Eclipse workspace.
 
 
 For more information, please refer to our PSL wiki at:
+
 	https://github.com/linqs/psl/wiki
 
 
