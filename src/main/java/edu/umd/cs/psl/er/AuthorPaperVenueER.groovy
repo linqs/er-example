@@ -81,30 +81,34 @@ m.add setcomparison: "sameAuthorSet" , using: SetComparison.CrossEquality, on : 
  * Now we can put everything together by defining some rules for our model.
  */
 
+ /*
+  * constraints to make equality symmetric
+  */
+m.add rule : sameAuthor(A1,A2) >> sameAuthor(A2,A1), constraint : true;
+m.add rule : sameVenue(V1,V2) >> sameVenue(V2,V1), constraint : true;
+m.add rule : samePaper(P1,P2) >> samePaper(P2,P1), constraint : true;
+
 /*
  * Here are some basic rules.
  */
 // similar names => same author
 m.add rule : (authorName(A1,N1) & authorName(A2,N2) & simName(N1,N2)) >> sameAuthor(A1,A2), weight : 1.0;
 // similar titles => same paper
-m.add rule : (paperTitle(P1,T1) & paperTitle(P2,T2) & simTitle(T1,T2) ) >> samePaper(P1,P2),  weight : 1.0;
+m.add rule : (paperTitle(P1,T1) & paperTitle(P2,T2) & simTitle(T1,T2)) >> samePaper(P1,P2),  weight : 1.0;
 // similar venues => same venue
-m.add rule : (venueName(V1,T1) & venueName(V2,T2) & simTitle(T1,T2) ) >> sameVenue(V1,V2), weight : 1.0;
-
+m.add rule : (venueName(V1,T1) & venueName(V2,T2) & simTitle(T1,T2)) >> sameVenue(V1,V2), weight : 1.0;
 
 /*
  * Here are some relational rules.
  * To see the benefit of the relational rules, comment this section out and re-run the script.
  */
-// if two references share a common publication, and have the same initials, then => same author
-m.add rule : (authorOf(A1,P1)   & authorOf(A2,P2)   & samePaper(P1,P2) &
-		authorName(A1,N1) & authorName(A2,N2) & sameInitials(N1,N2)) >> sameAuthor(A1,A2), weight : 1.0;
-// if two papers have a common set of authors, and the same number of tokens in the title, then => same paper
-m.add rule : (sameAuthorSet({P1.authorOf(inv)},{P2.authorOf(inv)}) & paperTitle(P1,T1) & paperTitle(P2,T2) &
-sameNumTokens(T1,T2)) >> samePaper(P1,P2),  weight : 1.0;
-// if two papers are the same, their venues are the same
+// If two papers are the same, their authors are the same
+m.add rule : (authorOf(A1,P1)   & authorOf(A2,P2)   & samePaper(P1,P2)) >> sameAuthor(A1,A2), weight : 1.0;
+// If two papers are the same, their venues are the same
 m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & samePaper(P1,P2)) >> sameVenue(V1,V2), weight : 1.0;
-
+// If author and venue are the same, the papers are the same
+m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & sameVenue(V1,V2) &
+		authorOf(A1,P1) & authorOf(A2,P2) & sameAuthor(A1,A2)) >> samePaper(P1,P2), weight : 1.0;
 
 /* 
  * Now we'll add a prior to the open predicates.
