@@ -25,6 +25,10 @@ Be sure to set the appropriate environment variables for Mosek. For 64-bit Linux
 
 (Note: <path_to_mosek> should be replaced with the path to wherever you installed Mosek.)
 
+Run the following command to install MOSEK into your maven repository
+
+	>> mvn install:install-file -Dfile=<path-to-mosek.jar> -DgroupId=com.mosek -DartifactId=mosek -Dversion=6.0 -Dpackaging=jar
+
 For instructions for other platforms, go to:
 
 	http://docs.mosek.com/6.0/toolsinstall/node003.html
@@ -45,7 +49,9 @@ Once you've downloaded everything, uncompress the data files (data.tar.gz) to th
 	
 5b) Generate the classpath using the command:
 
-	>> mvn dependency:build-classpath -Dmdep.outputFile=classpath.out  Note: you only have to do this once, and after that only if the dependencies change. i.e. If you just make a small tweak to the source code, you don't need to re-generate the classpath.
+	>> mvn dependency:build-classpath -Dmdep.outputFile=classpath.out  
+
+	Note: you only have to do this once, and after that only if the dependencies change. i.e. If you just make a small tweak to the source code, you don't need to re-generate the classpath.
 
 5c) Run the program with the following command (from within the project's directory):
 
