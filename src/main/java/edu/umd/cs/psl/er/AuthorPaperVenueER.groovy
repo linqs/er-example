@@ -105,6 +105,7 @@ sameNumTokens(T1,T2)) >> samePaper(P1,P2),  weight : 1.0;
 // if two papers are the same, their venues are the same
 m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & samePaper(P1,P2)) >> sameVenue(V1,V2), weight : 1.0;
 
+
 /* 
  * Now we'll add a prior to the open predicates.
  */
@@ -266,7 +267,7 @@ eval.evaluateModel(testingInference, [sameVenue, sameAuthor, samePaper], targetT
 	[venueCnt[1]*(venueCnt[1]-1), authorCnt[1]*(authorCnt[1]-1), paperCnt[1]*(paperCnt[1]-1)]);
 
 // check if a reasonable size for output
-if (paperCnt[1] < 100) {
+if (paperCnt[1] < 8) {
 	// Print results
 
 	print "Paper Pairs"

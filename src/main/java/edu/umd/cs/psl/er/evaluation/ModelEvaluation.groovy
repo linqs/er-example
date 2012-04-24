@@ -37,7 +37,7 @@ class ModelEvaluation
 		println("Model Evaluation: ");
 		for (predicate in openPredicates) {
 			println("  Predicate: " + predicate.getName());
-			for (double tol = 0.1; tol <= 0.9; tol += 0.1) {
+			for (double tol = 0.1; tol <= 1.0; tol += 0.1) {
 				comparator.setTolerance(tol);
 				def comparison = comparator.compare(predicate);
 				println("    Threshold = " + tol);
@@ -64,7 +64,7 @@ class ModelEvaluation
 		for (int i = 0; i < openPredicates.size; i++) {
 			def predicate = openPredicates[i];
 			println("  Predicate: " + predicate.getName());
-			for (double tol = 0.1; tol <= 0.9; tol += 0.1) {
+			for (double tol = 0.1; tol <= 1.0; tol += 0.1) {
 				comparator.setTolerance(tol);
 				def comparison = comparator.compare(predicate, maxBaseAtoms[i]);
 				println("    Threshold = " + tol);
