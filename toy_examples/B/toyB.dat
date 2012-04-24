@@ -1,0 +1,10 @@
+10000	Andrew McCallum,Kamal Nigam,Lyle H. Ungar	Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching	KDD00	1,2,3	100	1000
+10001	A. McCallum,K. Nigam,L. Ungar	Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching	Proceedings of KDD	1,2,3	100	1000
+10002	A. McCallum,K. Nigam,L. Ungar	Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching	KDD	1,2,3	100	1000
+10003	Andrew McCallum,Ben Wellner	Conditional Models of Identity Uncertainty with Application to Noun Coreference	NIPS	1,4	101	1001
+10004	Andrew McCallum,Ben Wellner	Conditional Models of Identity Uncertainty with Application to Noun Coreference	NIPS	1,4	101	1001
+10005	Warren Shen,Xin Li,AnHai Doan	Constraint-Based Entity Matching	AAAI	5,6,7	102	1003
+10006	W. Shen,Li Xin,An-Hai Doan	Constraint-Based Entity Matching	AAAI	5,6,7	102	1003
+10007	Xin Li,Paul Morie,Dan Roth	Semantic Integration in Text	AI Magazine	6,8,9	103	1004
+10008	X. Li,P. Morie,D. Roth	Semantic Integration in Text: From Ambiguous Names to Identifiable Entities	AIMag05	6,8,9	103	1004
+10009	H. Pasula,B. Marthi,S. Russell,I.Shpitser	Identity Uncertainty and Citation Matching	Neural Information Processing Systems	10,11,12	104	1001

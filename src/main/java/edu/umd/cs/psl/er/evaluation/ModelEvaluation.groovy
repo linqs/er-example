@@ -40,14 +40,16 @@ class ModelEvaluation
 			for (double tol = 0.1; tol <= 0.9; tol += 0.1) {
 				comparator.setTolerance(tol);
 				def comparison = comparator.compare(predicate);
-				println("    Tolerance = " + tol);
+				println("    Threshold = " + tol);
 				println("      Pos: Prec = " + comparison.getPrecision(BinaryClass.POSITIVE)
 						+ ", Rec = " + comparison.getRecall(BinaryClass.POSITIVE)
 						+ ", F1 = " + comparison.getF1(BinaryClass.POSITIVE));
 					
+				/*
 				println("      Neg: Prec = " + comparison.getPrecision(BinaryClass.NEGATIVE)
 						+ ", Rec = " + comparison.getRecall(BinaryClass.NEGATIVE)
 						+ ", F1 = " + comparison.getF1(BinaryClass.NEGATIVE));
+				*/
 			}
 		}	
 	}
@@ -65,14 +67,15 @@ class ModelEvaluation
 			for (double tol = 0.1; tol <= 0.9; tol += 0.1) {
 				comparator.setTolerance(tol);
 				def comparison = comparator.compare(predicate, maxBaseAtoms[i]);
-				println("    Tolerance = " + tol);
+				println("    Threshold = " + tol);
 				println("      Pos: Prec = " + comparison.getPrecision(BinaryClass.POSITIVE)
 						+ ", Rec = " + comparison.getRecall(BinaryClass.POSITIVE)
 						+ ", F1 = " + comparison.getF1(BinaryClass.POSITIVE));
-					
+				/*
 				println("      Neg: Prec = " + comparison.getPrecision(BinaryClass.NEGATIVE)
 						+ ", Rec = " + comparison.getRecall(BinaryClass.NEGATIVE)
 						+ ", F1 = " + comparison.getF1(BinaryClass.NEGATIVE));
+				*/
 			}
 		}
 	}

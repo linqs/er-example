@@ -18,10 +18,11 @@ import edu.umd.cs.psl.evaluation.resultui.UIFullInferenceResult
 ConfigManager cm = ConfigManager.getManager();
 ConfigBundle cb = cm.getBundle("er");
 
-
 /*** MODEL DEFINITION ***/
 println "Setting up psl model"
 PSLModel m = new PSLModel(this);
+
+
 
 /*
  * These are the predicates for our model.
@@ -37,26 +38,32 @@ m.add predicate: "equal", author1 : Entity,  author2 : Entity, open: true;
 m.add predicate: "sameName", name1 : Text, name2 : Text, open: true;
 
 
+
 /*
  * Here are some basic rules.
  */
+// symmetry
+m.add rule : equal(A1,A2) >> equal(A2,A1), constraint: true;
+
 // similar names => same author
-m.add rule : (authorName(A1,N1) & authorName(A2,N2) & similar(N1,N2)) >> equal(A1,A2), weight : 1.0;
+m.add rule : (authorName(A1,N1) & authorName(A2,N2) & similar(N1,N2)) >> equal(A1,A2), weight : 0.1;
 
 /*
  * Here are some relational rules.
- * To see the benefit of the relational rules, comment this section out and re-run the script.
+ * To see the benefit of the relational rules, comment this section out, recompile, and re-run.
  */
 // coauthors of the same author are likely the same person
-m.add rule : (coauthor(A1,C1) & coauthor(A2,C2) & equal(C1,C2)) >> equal(A1,A2), weight : 1.0;
+//m.add rule : (coauthor(A1,C1) & coauthor(A2,C2) & equal(C1,C2)) >> equal(A1,A2), weight : 0.1;
 
-// extra rule for easily readable pairs
-m.add rule : (authorName(A1,N1) & authorName(A2,N2) & equal(A1,A2)) >> sameName(N1,N2), weight: 10;
+
+
+// extra constraints allows easily readable output pairs
+m.add rule : (authorName(A1,N1) & authorName(A2,N2) & equal(A1,A2)) >> sameName(N1,N2), constraint: true;
 
 /* 
  * Now we'll add a prior to the open predicates.
  */
-m.add Prior.Simple, on : equal, weight: 1E-10;
+m.add Prior.Simple, on : equal, weight: 0.01;
 
 
 
@@ -79,8 +86,8 @@ def insert;
  * We start by reading in the non-target (i.e. evidence) predicate data.
  */
 
-nameFile = "toydata/authorName.txt";
-coauthorFile = "toydata/coauthor.txt"
+nameFile = "toy_examples/A/authorName.txt";
+coauthorFile = "toy_examples/A/coauthor.txt"
 
 insert = data.getInserter(authorName,0);
 insert.loadFromFile(nameFile);
