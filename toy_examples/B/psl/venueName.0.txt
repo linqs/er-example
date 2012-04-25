@@ -1,10 +1,10 @@
-1000	KDD00
-1001	Proceedings of KDD
-1002	KDD
-1003	NIPS
-1004	NIPS
-1005	AAAI
-1006	AAAI
-1007	AI Magazine
-1008	AIMag05
-1009	Neural Information Processing Systems
+1000	Knowledge Discovery and Data Mining (KDD)
+1001	Knowedge Discovery and Data Mining (KDD)
+1002	Knowledge Discovery and Data Mining 2000
+1003	Neural Information Processing Systems
+1004	Neural Information Processing
+1005	AAAI Conference
+1006	AAAI Conference
+1007	AAAI Conf
+1008	AI Magazine 2005
+1009	AI Magazine 2005

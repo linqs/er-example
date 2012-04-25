@@ -81,12 +81,7 @@ m.add setcomparison: "sameAuthorSet" , using: SetComparison.CrossEquality, on : 
  * Now we can put everything together by defining some rules for our model.
  */
 
- /*
-  * constraints to make equality symmetric
-  */
-m.add rule : sameAuthor(A1,A2) >> sameAuthor(A2,A1), constraint : true;
-m.add rule : sameVenue(V1,V2) >> sameVenue(V2,V1), constraint : true;
-m.add rule : samePaper(P1,P2) >> samePaper(P2,P1), constraint : true;
+
 
 /*
  * Here are some basic rules.
@@ -107,8 +102,9 @@ m.add rule : (authorOf(A1,P1)   & authorOf(A2,P2)   & samePaper(P1,P2)) >> sameA
 // If two papers are the same, their venues are the same
 m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & samePaper(P1,P2)) >> sameVenue(V1,V2), weight : 1.0;
 // If author and venue are the same, the papers are the same
-m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & sameVenue(V1,V2) &
-		authorOf(A1,P1) & authorOf(A2,P2) & sameAuthor(A1,A2)) >> samePaper(P1,P2), weight : 1.0;
+m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & sameVenue(V1,V2) & 
+			authorOf(A1,P1) & authorOf(A2,P2) & sameAuthor(A1,A2)) >> samePaper(P1,P2), weight : 1.0;
+
 
 /* 
  * Now we'll add a prior to the open predicates.

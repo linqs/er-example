@@ -1,10 +1,10 @@
 0	Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching
-1	Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching
+1	That paper about canopies
 2	Efficient Clustering of High-Dimensional Data Sets with Application to Reference Matching
 3	Conditional Models of Identity Uncertainty with Application to Noun Coreference
-4	Conditional Models of Identity Uncertainty with Application to Noun Coreference
+4	Conditional Models of Identiy Uncertainty Application to Noun-Coreference
 5	Constraint-Based Entity Matching
 6	Constraint-Based Entity Matching
-7	Semantic Integration in Text
-8	Semantic Integration in Text: From Ambiguous Names to Identifiable Entities
-9	Identity Uncertainty and Citation Matching
+7	Constraint-Based Entity Matching
+8	Semantic Integration in Text - From Ambiguous Names to Identifiable Entities 
+9	Semantic Integration in Text: From Ambiguous Names to Identifiable Entities
