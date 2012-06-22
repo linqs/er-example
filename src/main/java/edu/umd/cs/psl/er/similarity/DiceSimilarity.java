@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
+import edu.umd.cs.psl.model.function.AttributeSimilarityFunction;
+
+
 /*
  * Implements the dice similarity measure (quick-n-dirty version).
  * Notes:
@@ -28,7 +31,7 @@ import java.util.TreeSet;
  * 	- A better implementation might not use strings for bigrams.
  *	- The tokenizer could probably be improved.
  */
-public class DiceSimilarity
+public class DiceSimilarity implements AttributeSimilarityFunction 
 {
 	// similarity threshold (default=0.5)
 	private double simThresh;
