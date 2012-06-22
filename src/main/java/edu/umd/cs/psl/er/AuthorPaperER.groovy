@@ -1,20 +1,18 @@
 package edu.umd.cs.psl.er
 
-import java.io.FileReader;
-import java.util.concurrent.TimeUnit;
+import java.io.FileReader
+import java.util.concurrent.TimeUnit
 
 import edu.umd.cs.psl.config.*
 import edu.umd.cs.psl.database.RDBMS.DatabaseDriver
+import edu.umd.cs.psl.er.evaluation.ModelEvaluation
+import edu.umd.cs.psl.er.similarity.DiceSimilarity;
+import edu.umd.cs.psl.er.similarity.SameInitials
+import edu.umd.cs.psl.er.similarity.SameNumTokens
 import edu.umd.cs.psl.groovy.*
 import edu.umd.cs.psl.groovy.experiments.ontology.*
 import edu.umd.cs.psl.model.predicate.Predicate
 import edu.umd.cs.psl.ui.functions.textsimilarity.*
-import edu.umd.cs.psl.evaluation.resultui.UIFullInferenceResult
-
-import edu.umd.cs.psl.er.evaluation.ModelEvaluation
-import edu.umd.cs.psl.er.similarity.TitleSimilarity
-import edu.umd.cs.psl.er.similarity.SameInitials
-import edu.umd.cs.psl.er.similarity.SameNumTokens
 
 /*
  * Start and end times for timing information.
@@ -64,7 +62,7 @@ m.add predicate: "authorName" , author  : Entity,  name    : Text;
 m.add predicate: "paperTitle" , paper   : Entity,  title   : Text;
 m.add predicate: "authorOf"   , author  : Entity,  paper   : Entity;
 m.add function:  "simName"    , name1   : Text,    name2   : Text	, implementation: new LevenshteinStringSimilarity();
-m.add function:  "simTitle"   , title1  : Text,    title2  : Text	, implementation: new TitleSimilarity();
+m.add function:  "simTitle"   , title1  : Text,    title2  : Text	, implementation: new DiceSimilarity();
 m.add function:  "sameInitials", name1  : Text,    name2   : Text	, implementation: new SameInitials();
 m.add function:  "sameNumTokens", title1: Text,    title2  : Text	, implementation: new SameNumTokens();
 m.add predicate: "sameAuthor" , author1 : Entity,  author2 : Entity, open: true;

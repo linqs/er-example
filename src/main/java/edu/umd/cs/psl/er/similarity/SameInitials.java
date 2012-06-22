@@ -16,7 +16,6 @@
  */
 package edu.umd.cs.psl.er.similarity;
 
-import java.util.*;
 import edu.umd.cs.psl.model.function.AttributeSimilarityFunction;
 
 /**

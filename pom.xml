@@ -11,6 +11,11 @@
 			<artifactId>psl-groovy</artifactId>
 			<version>1.0.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.wcohen</groupId>
+			<artifactId>secondstring</artifactId>
+			<version>20120620</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

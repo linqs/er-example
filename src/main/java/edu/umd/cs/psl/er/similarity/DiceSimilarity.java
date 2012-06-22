@@ -20,7 +20,6 @@ package edu.umd.cs.psl.er.similarity;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Arrays;
 
 /*
  * Implements the dice similarity measure (quick-n-dirty version).
@@ -31,7 +30,18 @@ import java.util.Arrays;
  */
 public class DiceSimilarity
 {
-	public static double similarity(String first, String second) {
+	// similarity threshold (default=0.5)
+	private double simThresh;
+	
+	// constructors
+	public DiceSimilarity() {
+		this.simThresh = 0.5;
+	}
+	public DiceSimilarity(double simThresh) {
+		this.simThresh = simThresh;
+	}
+	
+	public double similarity(String first, String second) {
 		// Create two sets of character bigrams, one for each string.
 		Set<String> s1 = splitIntoBigrams(first);
 		Set<String> s2 = splitIntoBigrams(second);
@@ -50,7 +60,12 @@ public class DiceSimilarity
 		// D = ----------------------
 		//        | s1 | + | s2 |
 		// 
-		return (2.0 * (double)nt) / ((double)(n1 + n2));			
+		double sim = (2.0 * (double)nt) / ((double)(n1 + n2));
+		
+		if (sim < simThresh) 
+			return 0.0;
+		else 
+			return sim;
 	}
  
     private static Set<String> splitIntoBigrams(String s) {
