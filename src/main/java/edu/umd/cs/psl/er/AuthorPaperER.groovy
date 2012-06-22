@@ -61,8 +61,8 @@ PSLModel m = new PSLModel(this);
 m.add predicate: "authorName" , author  : Entity,  name    : Text;
 m.add predicate: "paperTitle" , paper   : Entity,  title   : Text;
 m.add predicate: "authorOf"   , author  : Entity,  paper   : Entity;
-m.add function:  "simName"    , name1   : Text,    name2   : Text	, implementation: new LevenshteinStringSimilarity();
-m.add function:  "simTitle"   , title1  : Text,    title2  : Text	, implementation: new DiceSimilarity();
+m.add function:  "simName"    , name1   : Text,    name2   : Text	, implementation: new LevenshteinStringSimilarity(0.5);
+m.add function:  "simTitle"   , title1  : Text,    title2  : Text	, implementation: new DiceSimilarity(0.5);
 m.add function:  "sameInitials", name1  : Text,    name2   : Text	, implementation: new SameInitials();
 m.add function:  "sameNumTokens", title1: Text,    title2  : Text	, implementation: new SameNumTokens();
 m.add predicate: "sameAuthor" , author1 : Entity,  author2 : Entity, open: true;
@@ -89,11 +89,12 @@ m.add rule : (paperTitle(P1,T1) & paperTitle(P2,T2) & simTitle(T1,T2) ) >> sameP
  * To see the benefit of the relational rules, comment this section out and re-run the script.
  */
 // if two references share a common publication, and have the same initials, then => same author
+
 m.add rule : (authorOf(A1,P1)   & authorOf(A2,P2)   & samePaper(P1,P2) &
               authorName(A1,N1) & authorName(A2,N2) & sameInitials(N1,N2)) >> sameAuthor(A1,A2), weight : 1.0;
 // if two papers have a common set of authors, and the same number of tokens in the title, then => same paper
 m.add rule : (sameAuthorSet({P1.authorOf(inv)},{P2.authorOf(inv)}) & paperTitle(P1,T1) & paperTitle(P2,T2) & 
-              sameNumTokens(T1,T2)) >> samePaper(P1,P2),  weight : 1.0;
+             sameNumTokens(T1,T2)) >> samePaper(P1,P2),  weight : 1.0;
 
 /* 
  * Now we'll add a prior to the open predicates.
