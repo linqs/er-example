@@ -13,6 +13,7 @@ import edu.umd.cs.psl.groovy.*
 import edu.umd.cs.psl.groovy.experiments.ontology.*
 import edu.umd.cs.psl.model.predicate.Predicate
 import edu.umd.cs.psl.ui.functions.textsimilarity.*
+import edu.umd.cs.psl.evaluation.resultui.printer.FileAtomPrintStream;
 
 /*
  * Start and end times for timing information.
@@ -272,3 +273,8 @@ println "  Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime)
 eval.evaluateModel(testingInference, [sameAuthor, samePaper], targetTestingPartition, [authorCnt[1]*(authorCnt[1]-1), paperCnt[1]*(paperCnt[1]-1)]);
 
 
+/*****
+Temporary file output test
+******/
+def writer = new FileAtomPrintStream("fileOutputTest.txt", " ")
+testingInference.printAtoms(sameAuthor, writer, false)
