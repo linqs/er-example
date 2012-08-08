@@ -16,12 +16,11 @@
  */
 package edu.umd.cs.psl.er.similarity;
 
-import java.util.*;
 import edu.umd.cs.psl.model.function.AttributeSimilarityFunction;
 
 /**
- * This external similarity function returns 1 if the input names
- * have the same initials, and 0 otherwise.
+ * Returns 1 if the input names have the same initials
+ * (ignoring case and order), and 0 otherwise.
  */
 class SameInitials implements AttributeSimilarityFunction
 {
@@ -30,9 +29,27 @@ class SameInitials implements AttributeSimilarityFunction
 		String[] tokens1 = b.split("\\s+");
 		if (tokens0.length != tokens1.length)
 			return 0.0;
-		for(int i = 0; i < tokens0.length; i++)
-			if (tokens0[i].charAt(0) != tokens1[i].charAt(0))
+		
+		int[] initialsHistogram0 = new int[27];
+		int[] initialsHistogram1 = new int[27];
+		
+		for (int i = 0; i < tokens0.length; i++) {
+			updateHistogram(tokens0[i].toLowerCase().charAt(0), initialsHistogram0);
+			updateHistogram(tokens1[i].toLowerCase().charAt(0), initialsHistogram1);
+		}
+		
+		for (int i = 0; i < initialsHistogram0.length; i++)
+			if (initialsHistogram0[i] != initialsHistogram1[i])
 				return 0.0;
+		
 		return 1.0;
+    }
+    
+    static void updateHistogram(char initial, int[] histogram) {
+    	int code = (int) initial - 97;
+    	if (code < 0 || code > 25)
+    		code = 26;
+    	
+    	histogram[code]++;
     }
 }
