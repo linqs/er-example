@@ -12,6 +12,11 @@
 			<version>1.0.3</version>
 		</dependency>
 		<dependency>
+			<groupId>edu.umd.cs</groupId>
+			<artifactId>psl-addon-mosek</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
 			<groupId>com.wcohen</groupId>
 			<artifactId>secondstring</artifactId>
 			<version>20120620</version>

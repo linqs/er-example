@@ -13,8 +13,10 @@ import edu.umd.cs.psl.evaluation.resultui.UIFullInferenceResult
 
 import edu.umd.cs.psl.er.evaluation.ModelEvaluation
 import edu.umd.cs.psl.er.similarity.DiceSimilarity;
+import edu.umd.cs.psl.er.similarity.JaroWinklerSimilarity;
 import edu.umd.cs.psl.er.similarity.SameInitials
 import edu.umd.cs.psl.er.similarity.SameNumTokens
+import edu.umd.cs.psl.er.evaluation.FileAtomPrintStream;
 
 /*
  * Start and end times for timing information.
@@ -65,17 +67,12 @@ m.add predicate: "paperTitle" , paper   : Entity,  title   : Text;
 m.add predicate: "paperVenue" , paper   : Entity,  venue   : Entity;
 m.add predicate: "venueName"  , venue   : Entity,  title   : Text;
 m.add predicate: "authorOf"   , author  : Entity,  paper   : Entity;
-m.add function:  "simName"    , name1   : Text,    name2   : Text	, implementation: new LevenshteinStringSimilarity();
-m.add function:  "simTitle"   , title1  : Text,    title2  : Text	, implementation: new DiceSimilarity();
+m.add function:  "simName"    , name1   : Text,    name2   : Text	, implementation: new LevenshteinStringSimilarity(0.2);
+m.add function:  "simTitle"   , title1  : Text,    title2  : Text	, implementation: new LevenshteinStringSimilarity(0.2);
 m.add function:  "sameInitials", name1  : Text,    name2   : Text	, implementation: new SameInitials();
-m.add function:  "sameNumTokens", title1: Text,    title2  : Text	, implementation: new SameNumTokens();
 m.add predicate: "sameAuthor" , author1 : Entity,  author2 : Entity, open: true;
 m.add predicate: "samePaper"  , paper1  : Entity,  paper2  : Entity, open: true;
 m.add predicate: "sameVenue"  , venue1  : Entity,  venue2  : Entity, open: true;
-/*
- * Set comparison functions operate on sets and return a scalar.
- */
-m.add setcomparison: "sameAuthorSet" , using: SetComparison.CrossEquality, on : sameAuthor;
 
 /*
  * Now we can put everything together by defining some rules for our model.
@@ -97,27 +94,25 @@ m.add rule : (venueName(V1,T1) & venueName(V2,T2) & simTitle(T1,T2)) >> sameVenu
  * Here are some relational rules.
  * To see the benefit of the relational rules, comment this section out and re-run the script.
  */
+
 // If two papers are the same, their authors are the same
 m.add rule : (authorOf(A1,P1)   & authorOf(A2,P2)   & samePaper(P1,P2)) >> sameAuthor(A1,A2), weight : 1.0;
 // If two papers are the same, their venues are the same
 m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & samePaper(P1,P2)) >> sameVenue(V1,V2), weight : 1.0;
-// If author and venue are the same, the papers are the same
-m.add rule : (paperVenue(P1,V1) & paperVenue(P2,V2) & sameVenue(V1,V2) & 
-			authorOf(A1,P1) & authorOf(A2,P2) & sameAuthor(A1,A2)) >> samePaper(P1,P2), weight : 1.0;
 
 
 /* 
  * Now we'll add a prior to the open predicates.
  */
-m.add Prior.Simple, on : sameAuthor, weight: 1E-10;
-m.add Prior.Simple, on : samePaper,  weight: 1E-10;
-m.add Prior.Simple, on : sameVenue,  weight: 1E-10;
-
+m.add Prior.Simple, on : sameAuthor, weight: 1E-6;
+m.add Prior.Simple, on : samePaper,  weight: 1E-6;
+m.add Prior.Simple, on : sameVenue,  weight: 1E-6;
 
 println "done!"
 
 /*** LOAD DATA ***/
 println "Creating a new DB and loading data:"
+for (testingFold = 0 ; testingFold < 4; testingFold++) {
 
 /*
  * We'll create a new relational DB.
@@ -133,18 +128,15 @@ DataStore data = new RelationalDataStore(m);
  */
 //data.setup db: DatabaseDriver.H2;
 //data.setup db: DatabaseDriver.H2, type: "memory";
-data.setup db: DatabaseDriver.H2, folder: "/tmp/";
+data.setup db: DatabaseDriver.H2, folder: "/tmp/tmp2";
 
 /*
  * These are just some constants that we'll use to reference data files and DB partitions.
  * To change the dataset (e.g. big, medium, small, tiny), change the dir variable.
  */
-int trainingFold = 0;
-int testingFold = 1;
-int evidenceTrainingPartition = 1;
-int evidenceTestingPartition = 2;
-int targetTrainingPartition = 3;
-int targetTestingPartition = 4;
+
+int evidenceTestingPartition = 1;
+int targetTestingPartition = 2;
 
 /* 
  * Now we'll load some data from tab-delimited files into the DB.
@@ -158,12 +150,6 @@ def insert;
  */
 for (Predicate p1 : [authorName,paperTitle,authorOf,paperVenue,venueName])
 {
-	String trainFile = datadir + p1.getName() + "." + trainingFold + ".txt";
-	print "  Reading " + trainFile + " ... ";
-	insert = data.getInserter(p1,evidenceTrainingPartition);
-	insert.loadFromFile(trainFile);
-	println "done!"
-
 	String testFile = datadir + p1.getName() + "." + testingFold + ".txt";
 	print "  Reading " + testFile + " ... ";
 	insert = data.getInserter(p1,evidenceTestingPartition);
@@ -175,13 +161,6 @@ for (Predicate p1 : [authorName,paperTitle,authorOf,paperVenue,venueName])
  */
 for (Predicate p3 : [sameAuthor,samePaper,sameVenue])
 {
-	//training data
-	String trainFile = datadir + p3.getName() + "." + trainingFold + ".txt";
-	print "  Reading " + trainFile + " ... ";
-	insert = data.getInserter(p3,targetTrainingPartition)
-	insert.loadFromFileWithTruth(trainFile);
-	println "done!"
-
 	//testing data
 	String testFile = datadir + p3.getName() + "." + testingFold + ".txt";
 	print "  Reading " + testFile + " ... ";
@@ -190,68 +169,7 @@ for (Predicate p3 : [sameAuthor,samePaper,sameVenue])
 	println "done!"
 }
 
-/*** WEIGHT LEARNING ***/
-
-/*
- * This is how we perform weight learning.
- * Note that one must specify the open predicates and the evidence and target partitions.
- */
-if (learnWeights)
-{
-	/*
-	 * We need to setup some weight learning parameters.
-	 */
-	def learningConfig = new WeightLearningConfiguration();
-	learningConfig.setLearningType(WeightLearningConfiguration.Type.Perceptron);	// voted perceptron-style optimization
-
-	/*
-	 * Now we run the learning algorithm.
-	 */
-	print "\nStarting weight learning ... ";
-	startTime = System.nanoTime();
-	m.learn data, evidence:evidenceTrainingPartition, infered:targetTrainingPartition, close:[sameAuthor,samePaper,sameVenue], configuration:learningConfig, config:cb;
-	endTime = System.nanoTime();
-	println "done!"
-	println "  Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime) + " secs";
-
-	/*
-	 * Now let's print the model to see the learned weights.
-	 */
-	println "Learned model:\n";
-	println m;
-}
-
 /*** INFERENCE ***/
-
-/*
- * Note: to run evaluation of ER inference, we need to specify the total number of
- * pairwise combinations of authors and papers, which we pass to evaluateModel() in an array.
- * This is for memory efficiency, since we don't want to actually load truth data for all
- * possible pairs (though one could).
- *
- * To get the total number of possible combinations, we'll scan the author/paper reference files,
- * counting the number of lines.
- */
-int[] authorCnt = new int[2];
-int[] paperCnt = new int[2];
-int[] venueCnt = new int[2];
-FileReader rdr = null;
-for (int i = 0; i < 2; i++) {
-	rdr = new FileReader(datadir + "authorName." + i + ".txt");
-	while (rdr.readLine() != null) authorCnt[i]++;
-	println "Authors fold " + i + ": " + authorCnt[i];
-	rdr = new FileReader(datadir + "paperTitle." + i + ".txt");
-	while (rdr.readLine() != null) paperCnt[i]++;
-	println "Papers  fold " + i + ": " + paperCnt[i];
-	rdr = new FileReader(datadir + "paperVenue." + i + ".txt");
-	while (rdr.readLine() != null) venueCnt[i]++;
-	println "Venues  fold " + i + ": " + venueCnt[i];
-}
-
-/*
- * Let's create an instance of our evaluation class.
- */
-def eval = new ModelEvaluation(data);
 
 /*
  * Evalute inference on the testing set.
@@ -263,21 +181,16 @@ endTime = System.nanoTime();
 println "done!";
 println "  Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime) + " secs";
 
-eval.evaluateModel(testingInference, [sameVenue, sameAuthor, samePaper], targetTestingPartition, 
-	[venueCnt[1]*(venueCnt[1]-1), authorCnt[1]*(authorCnt[1]-1), paperCnt[1]*(paperCnt[1]-1)]);
+def writer = new FileAtomPrintStream("coraAuthor"+testingFold+".txt", " ")
+//def writer = new FileAtomPrintStream("attribute.txt", " ")
+testingInference.printAtoms(sameAuthor, writer, false)
 
-// check if a reasonable size for output
-if (paperCnt[1] < 8) {
-	// Print results
+writer = new FileAtomPrintStream("coraPaper"+testingFold+".txt", " ")
+//def writer = new FileAtomPrintStream("attribute.txt", " ")
+testingInference.printAtoms(samePaper, writer, false)
 
-	print "Paper Pairs"
-	testingInference.printAtoms(samePaper,true);
-	print "Author pairs"
-	testingInference.printAtoms(sameAuthor,true);
-	print "Venue pairs"
-	testingInference.printAtoms(sameVenue,true);
+writer = new FileAtomPrintStream("coraVenue"+testingFold+".txt", " ")
+//def writer = new FileAtomPrintStream("attribute.txt", " ")
+testingInference.printAtoms(sameVenue, writer, false)
+
 }
-
-
-
-

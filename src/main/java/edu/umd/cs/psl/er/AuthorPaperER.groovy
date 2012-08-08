@@ -13,7 +13,7 @@ import edu.umd.cs.psl.groovy.*
 import edu.umd.cs.psl.groovy.experiments.ontology.*
 import edu.umd.cs.psl.model.predicate.Predicate
 import edu.umd.cs.psl.ui.functions.textsimilarity.*
-import edu.umd.cs.psl.evaluation.resultui.printer.FileAtomPrintStream;
+import edu.umd.cs.psl.er.evaluation.FileAtomPrintStream;
 
 /*
  * Start and end times for timing information.
@@ -100,8 +100,8 @@ m.add rule : (sameAuthorSet({P1.authorOf(inv)},{P2.authorOf(inv)}) & paperTitle(
 /* 
  * Now we'll add a prior to the open predicates.
  */
-m.add Prior.Simple, on : sameAuthor, weight: 1E-10;
-m.add Prior.Simple, on : samePaper,  weight: 1E-10;
+m.add Prior.Simple, on : sameAuthor, weight: 1E-6;
+m.add Prior.Simple, on : samePaper,  weight: 1E-6;
 
 /*
  * We'll also set the activation threshold
@@ -272,9 +272,3 @@ println "done!";
 println "  Elapsed time: " + TimeUnit.NANOSECONDS.toSeconds(endTime - startTime) + " secs";
 eval.evaluateModel(testingInference, [sameAuthor, samePaper], targetTestingPartition, [authorCnt[1]*(authorCnt[1]-1), paperCnt[1]*(paperCnt[1]-1)]);
 
-
-/*****
-Temporary file output test
-******/
-def writer = new FileAtomPrintStream("fileOutputTest.txt", " ")
-testingInference.printAtoms(sameAuthor, writer, false)
